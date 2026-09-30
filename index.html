@@ -1,0 +1,131 @@
+<!doctype html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="apple-mobile-web-app-title" content="刑視庁">
+<meta name="theme-color" content="#ffffff">
+<link rel="manifest" href="manifest.json">
+<link rel="apple-touch-icon" href="icon.svg">
+<link rel="icon" href="icon.svg">
+<title>刑務所内向けインフォメーション | 刑視庁</title>
+<link rel="stylesheet" href="fonts/play.css">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<header class="site-header">
+  <div class="agency">
+    <svg class="emblem" viewBox="0 0 48 48" aria-hidden="true">
+      <circle cx="24" cy="24" r="22" fill="none" stroke="#1a1a1a" stroke-width="2.5"/>
+      <path d="M24 9l12 4v9c0 8-5 13-12 17-7-4-12-9-12-17v-9z" fill="#1a1a1a"/>
+      <path d="M18 20h12M18 25h12M18 30h12M22 17v16M26 17v16" stroke="#fff" stroke-width="1.6"/>
+    </svg>
+    <span class="agency-name">刑視庁</span>
+  </div>
+</header>
+
+<main>
+  <h1>刑務所内向けインフォメーション</h1>
+  <p class="lead">収容者の皆さまへ、必要な情報をお知らせします。項目を選択してください。</p>
+
+  <ul class="menu">
+    <li>
+      <button type="button" class="menu-item" data-modal="modal-caution">
+        <span class="menu-label">注意事項</span>
+        <span class="menu-arrow" aria-hidden="true">›</span>
+      </button>
+    </li>
+    <li>
+      <button type="button" class="menu-item" data-modal="modal-warden">
+        <span class="menu-label">看守長の挨拶</span>
+        <span class="menu-arrow" aria-hidden="true">›</span>
+      </button>
+    </li>
+  </ul>
+
+  <!-- ハッキング後に出現 -->
+  <a class="code-btn" id="code-btn" href="#" hidden>Code auto β</a>
+</main>
+
+<footer class="site-footer">
+  <p>刑視庁 刑務所管理部</p>
+</footer>
+
+<!-- 注意事項 -->
+<div class="overlay" id="modal-caution" hidden>
+  <section class="modal" role="dialog" aria-modal="true" aria-labelledby="t-caution">
+    <button type="button" class="close" aria-label="閉じる">×</button>
+    <h2 id="t-caution">注意事項</h2>
+    <div class="banner-mark" aria-hidden="true">
+      <span class="hand">✋</span>
+      <span class="slash"></span>
+    </div>
+    <p>刑務所内では走らない。<br>
+    手に赤い斜線の入ったマークがついているものには触れない。<br>
+    何かあったらスタッフに伝えること。</p>
+  </section>
+</div>
+
+<!-- 看守長の挨拶 -->
+<div class="overlay" id="modal-warden" hidden>
+  <section class="modal modal-long" role="dialog" aria-modal="true" aria-labelledby="t-warden">
+    <button type="button" class="close" aria-label="閉じる">×</button>
+    <h2 id="t-warden">看守長の挨拶</h2>
+    <div class="scroll">
+      <p>ああああああああああああああああああああああああああああああああああああああああああああああああああああああああああああ</p>
+      <p>ああああああああああああああああああああああああああああああああああああああああああああああああああああああああああああ</p>
+      <p>ああああああああああああああああああああああああああああああああああああああああああああああああああああああああああああ</p>
+      <p>ああああああああああああああああああああああああああああああああああああああああああああああああああああああああああああ</p>
+    </div>
+  </section>
+</div>
+
+<!-- 隠しタップ領域 (右下) -->
+<div class="secret-zone" id="secret-zone" aria-hidden="true"></div>
+
+<!-- ハッキングされたシステム -->
+<div class="overlay hk" id="hk-msg" hidden>
+  <section class="modal hk-modal" role="dialog" aria-modal="true">
+    <h2 class="hk-title">▍INCOMING TRANSMISSION</h2>
+    <div class="scroll hk-body" id="hk-msg-body"></div>
+  </section>
+</div>
+
+<div class="overlay hk hk-front" id="hk-choice" hidden>
+  <section class="modal hk-choice" role="dialog" aria-modal="true">
+    <img class="glasses" src="images/glasses.png" alt="">
+    <p class="choice-text">開くなら⭕️、<br>閉じるなら❌を選択してください。</p>
+    <div class="choices">
+      <button type="button" class="choice-btn" id="hk-yes" aria-label="丸">⭕</button>
+      <button type="button" class="choice-btn" id="hk-no" aria-label="バツ">❌</button>
+    </div>
+  </section>
+</div>
+
+<div class="overlay hk hk-front2" id="hk-thanks" hidden>
+  <section class="modal hk-modal" role="dialog" aria-modal="true">
+    <h2 class="hk-title">▍INCOMING TRANSMISSION</h2>
+    <div class="scroll hk-body" id="hk-thanks-body"></div>
+  </section>
+</div>
+
+<div class="overlay hk hk-front" id="hk-quiz" hidden>
+  <section class="modal hk-modal hk-blue" role="dialog" aria-modal="true">
+    <h2 class="hk-title">▍Code auto β</h2>
+    <p class="q-text">Question 0 ;&nbsp; 写真を撮る時に使うものは何？</p>
+    <form class="q-row" id="q-form" autocomplete="off">
+      <span class="q-arrow">→</span>
+      <input id="q-input" type="text" autocapitalize="off" autocorrect="off" spellcheck="false" enterkeyhint="go" aria-label="答え">
+      <button type="submit" class="q-send" id="q-send">送信</button>
+    </form>
+    <p class="q-status" id="q-status" hidden>正解を確認。読み込み中......</p>
+  </section>
+</div>
+
+<script src="app.js"></script>
+</body>
+</html>
