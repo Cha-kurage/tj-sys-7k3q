@@ -25,14 +25,30 @@
   var MSG2 = [
     '利用者の承認が確認できました。',   
   ];
+  var PEER_HOLD_MS = 1500;         // 「仲間」の長押し時間
   var WRONG_MS = 500;              // 「間違い」の表示時間
   var LONGPRESS_MS = 1200;         // 「練習を終える」の長押し時間
   var ANALYZE_MS = 2500;           // 「情報を分析中」から結果表示までの時間
+  // 各Question: text=問題文 / answers=答え(ひらがな・カタカナ・半角どれでも可)
+  //   items=選択肢の画像(images/item-◯◯.png と images/icon-◯◯.png) / correct=正解の選択(順不同)
   var QUESTIONS = [
-    { text: 'Question 0 ;\u00a0 写真を撮る時に使うものは何？', answers: ['カメラ'], correct: ['mask', 'pencil'], endPractice: true },   // 答えはひらがな・カタカナ・半角どれでも可
-    { text: 'Question 1 ;\u00a0 作戦の時間についての情報は？', answers: [] },      // 答え・選択肢は未定
-    { text: 'Question 2 ;\u00a0 爆破する場所についての情報は？', answers: [] },    // 答え・選択肢は未定
-    { text: 'Question 3 ;\u00a0 (問題文は未定です)', answers: [] }                   // 内容を確認中
+    { text: 'Question 0 ;\u00a0 写真を撮る時に使うものは何？',
+      answers: ['カメラ'],
+      items: ['mask', 'pencil', 'pen'],
+      correct: ['mask', 'pencil'],
+      endPractice: true },
+    { text: 'Question 1 ;\u00a0 作戦の時間についての情報は？',
+      answers: ['にじよりかいし'],
+      items: ['chain', 'sharp', 'ballpoint', 'fountain'],      // 鎖・シャープペン・ボールペン・万年筆
+      correct: ['chain', 'ballpoint'] },
+    { text: 'Question 2 ;\u00a0 爆破する場所についての情報は？',
+      answers: ['えいちのにばんくかく'],
+      items: ['diamond', 'heart', 'club', 'spade'],            // ダイヤ・ハート・クラブ・スペード
+      correct: ['heart', 'diamond', 'spade', 'club'] },
+    { text: 'Question 3 ;\u00a0 脱出するために鍵となる場所は？',
+      answers: ['ぬけみちはえふのさん'],
+      items: ['file', 'tablet', 'timer'],                      // ファイル・タブレット・タイマー
+      correct: ['file', 'tablet'] }
   ];
   var CONSOLE_LINES = [
     '$ ssh -p 2222 root@keishicho-core',
@@ -50,6 +66,7 @@
   ];
 
   /* ================= 共通 ================= */
+  var records = [];   // 完了したQuestionの記録 (この端末での出来事)
   function $(id) { return document.getElementById(id); }
   function sleep(ms) { return new Promise(function (r) { setTimeout(r, ms); }); }
 
@@ -174,6 +191,29 @@
     btn.scrollIntoView({ behavior: 'smooth', block: 'end' });
   }
 
+  /* ---- これまでの記録 ---- */
+  $('record-btn').addEventListener('click', function () {
+    var body = $('record-body');
+    body.innerHTML = '';
+    if (!records.length) {
+      body.innerHTML = '<p class="rec-empty">記録はまだありません。</p>';
+    }
+    records.forEach(function (r) {
+      var div = document.createElement('div');
+      div.className = 'rec-item';
+      var q = document.createElement('p'); q.className = 'rec-q'; q.textContent = r.text;
+      var a = document.createElement('p'); a.className = 'rec-a'; a.textContent = '→ ' + r.answer;
+      var ic = document.createElement('div'); ic.className = 'rec-icons';
+      r.selected.forEach(function (id) {
+        var img = document.createElement('img'); img.src = 'images/icon-' + id + '.png'; img.alt = '';
+        ic.appendChild(img);
+      });
+      div.appendChild(q); div.appendChild(a); div.appendChild(ic);
+      body.appendChild(div);
+    });
+    show('modal-record');
+  });
+
   /* ---- Code auto β → 練習問題 ---- */
 
   function normalize(str) {
@@ -185,15 +225,27 @@
     var input = $('q-input'), form = $('q-form');
     var current = 0, solved = false, analyzing = 0;
     var selected = [];          // 選択順のアイテムid
-    var peerTaps = 0, peerTimer = null;
+
+    // 現在のQuestionの選択肢を並べる
+    function renderItems() {
+      var box = $('items');
+      box.innerHTML = '';
+      QUESTIONS[current].items.forEach(function (id) {
+        var b = document.createElement('button');
+        b.type = 'button';
+        b.className = 'item';
+        b.dataset.id = id;
+        b.dataset.icon = 'images/icon-' + id + '.png';
+        b.setAttribute('aria-pressed', 'false');
+        b.innerHTML = '<img src="images/item-' + id + '.png" alt="" draggable="false"><span class="item-check">✓</span>';
+        box.appendChild(b);
+      });
+    }
 
     function resetSelection() {
       selected = [];
-      document.querySelectorAll('.item').forEach(function (b) {
-        b.classList.remove('selected');
-        b.setAttribute('aria-pressed', 'false');
-      });
       $('tray').innerHTML = '';
+      renderItems();
     }
 
     function check() {
@@ -219,50 +271,65 @@
       }
     }
 
+    renderItems();
+
     // 送信ボタン (またはEnter) で判定。不正解は無反応
     form.addEventListener('submit', function (e) { e.preventDefault(); check(); });
 
     // アイテムの選択/解除。選択中のものは下のトレイにアイコン表示
-    document.querySelectorAll('.item').forEach(function (btn) {
-      btn.addEventListener('click', function () {
-        var id = btn.dataset.id, idx = selected.indexOf(id);
-        if (idx >= 0) {
-          selected.splice(idx, 1);
-          btn.classList.remove('selected');
-          btn.setAttribute('aria-pressed', 'false');
-          var old = $('tray').querySelector('[data-id="' + id + '"]');
-          if (old) old.remove();
-        } else {
-          selected.push(id);
-          btn.classList.add('selected');
-          btn.setAttribute('aria-pressed', 'true');
-          var img = document.createElement('img');
-          img.className = 'tray-icon';
-          img.src = btn.dataset.icon;
-          img.alt = '';
-          img.dataset.id = id;
-          $('tray').appendChild(img);
-        }
-      });
+    $('items').addEventListener('click', function (e) {
+      var btn = e.target.closest('.item');
+      if (!btn) return;
+      var id = btn.dataset.id, idx = selected.indexOf(id);
+      if (idx >= 0) {
+        selected.splice(idx, 1);
+        btn.classList.remove('selected');
+        btn.setAttribute('aria-pressed', 'false');
+        var old = $('tray').querySelector('[data-id="' + id + '"]');
+        if (old) old.remove();
+      } else {
+        selected.push(id);
+        btn.classList.add('selected');
+        btn.setAttribute('aria-pressed', 'true');
+        var img = document.createElement('img');
+        img.className = 'tray-icon';
+        img.src = btn.dataset.icon;
+        img.alt = '';
+        img.dataset.id = id;
+        $('tray').appendChild(img);
+      }
     });
 
-    // 「仲間」を5回タップ → 次のQuestionへ (ゆっくりタップ対応)
-    $('tap-target').addEventListener('click', function () {
-      if (!solved || current >= QUESTIONS.length - 1) return;
-      peerTaps++;
-      clearTimeout(peerTimer);
-      if (peerTaps >= TAPS_REQUIRED) {
-        peerTaps = 0;
+    // 「仲間」を長押し → 次のQuestionへ (正解でなければ「間違い」)
+    var peerHold = null, peerEl = $('tap-target');
+    function cancelPeer() { clearTimeout(peerHold); peerHold = null; }
+    peerEl.addEventListener('pointerdown', function () {
+      if (!solved) return;
+      cancelPeer();
+      peerHold = setTimeout(function () {
+        peerHold = null;
         if (!isCorrect()) { flashWrong(); return; }
+        recordCurrent();
         if (QUESTIONS[current].endPractice) showEndPractice();
-        else nextQuestion();
-        return;
-      }
-      peerTimer = setTimeout(function () { peerTaps = 0; }, TAP_RESET_MS);
+        else if (current < QUESTIONS.length - 1) nextQuestion();
+        // 最後のQuestionの正解後の動作は未定
+      }, PEER_HOLD_MS);
     });
+    ['pointerup', 'pointerleave', 'pointercancel'].forEach(function (t) {
+      peerEl.addEventListener(t, cancelPeer);
+    });
+    peerEl.addEventListener('contextmenu', function (e) { e.preventDefault(); });
+
+    function recordCurrent() {
+      records.push({ text: QUESTIONS[current].text, answer: input.value, selected: selected.slice() });
+    }
 
     // 練習問題のあと: 「練習を終える」だけを表示し、長押しで次へ
     function showEndPractice() {
+      var rb = $('record-btn');           // 「練習を終える」画面が出たら「これまでの記録を見る」を解禁
+      rb.classList.remove('locked');
+      rb.removeAttribute('aria-hidden');
+      rb.removeAttribute('tabindex');
       document.querySelector('.cab-main').classList.add('ending');
       document.querySelector('.cab-main').scrollTop = 0;
     }

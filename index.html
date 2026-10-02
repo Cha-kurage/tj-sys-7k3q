@@ -48,7 +48,10 @@
   </ul>
 
   <!-- ハッキング後に出現 -->
-  <a class="code-btn" id="code-btn" href="#" hidden>Code auto β</a>
+  <div class="action-row">
+    <a class="code-btn" id="code-btn" href="#" hidden>Code auto β</a>
+    <button type="button" class="record-btn locked" id="record-btn" aria-hidden="true" tabindex="-1">これまでの記録を見る</button>
+  </div>
 </main>
 
 <footer class="site-footer">
@@ -81,6 +84,15 @@
       <p>ああああああああああああああああああああああああああああああああああああああああああああああああああああああああああああ</p>
       <p>ああああああああああああああああああああああああああああああああああああああああああああああああああああああああああああ</p>
     </div>
+  </section>
+</div>
+
+<!-- これまでの記録 -->
+<div class="overlay" id="modal-record" hidden>
+  <section class="modal modal-long" role="dialog" aria-modal="true" aria-labelledby="t-record">
+    <button type="button" class="close" aria-label="閉じる">×</button>
+    <h2 id="t-record">これまでの記録</h2>
+    <div class="scroll" id="record-body"></div>
   </section>
 </div>
 
@@ -126,6 +138,7 @@
     <section class="cab-question">
       <p class="q-text" id="q-text">Question 0 ;&nbsp; 写真を撮る時に使うものは何？</p>
     </section>
+    <p class="q-note">全てひらがなで入力</p>
 
     <form class="q-row" id="q-form" autocomplete="off">
       <span class="q-arrow">→</span>
@@ -136,17 +149,20 @@
 
     <section class="result" id="result" hidden>
       <p class="result-text">分析結果はこちらです。必要なアイテムを取捨選択し、情報伝達に役立ててください。</p>
-      <div class="items" id="items">
-        <button type="button" class="item" data-id="mask" data-icon="images/icon-mask.png" aria-pressed="false"><img src="images/item-mask.png" alt="" draggable="false"><span class="item-check">✓</span></button>
-        <button type="button" class="item" data-id="pencil" data-icon="images/icon-pencil.png" aria-pressed="false"><img src="images/item-pencil.png" alt="" draggable="false"><span class="item-check">✓</span></button>
-        <button type="button" class="item" data-id="pen" data-icon="images/icon-pen.png" aria-pressed="false"><img src="images/item-pen.png" alt="" draggable="false"><span class="item-check">✓</span></button>
-      </div>
+      <div class="items" id="items"></div>
       <div class="tray" id="tray"></div>
       <p class="hint">(選択できたら、<span class="tap-target" id="tap-target">仲間</span>にこの画面を見せて確認してもらおう)</p>
       <p class="wrong" id="wrong" aria-live="polite">間違い</p>
     </section>
 
     <section class="end-practice" id="end-practice">
+      <div class="end-note">
+        <svg class="end-arrow" viewBox="0 0 48 110" aria-hidden="true">
+          <path d="M24 106 V16" fill="none" stroke="#4dd2ff" stroke-width="5" stroke-linecap="round"/>
+          <path d="M8 32 L24 8 L40 32" fill="none" stroke="#4dd2ff" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+        <p>インフォメーションページから<br>この端末での出来事を振り返ることができる。</p>
+      </div>
       <button type="button" class="end-btn" id="end-btn"><span class="end-fill"></span><span class="end-label">練習を終える</span></button>
     </section>
   </main>
