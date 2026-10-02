@@ -97,11 +97,10 @@
 
 <div class="overlay hk hk-front" id="hk-choice" hidden>
   <section class="modal hk-choice" role="dialog" aria-modal="true">
-    <img class="glasses" src="images/glasses.png" alt="">
-    <p class="choice-text">開くなら⭕️、<br>閉じるなら❌を選択してください。</p>
+    <img class="choice-head" src="images/choice-head.png" alt="開くなら丸、閉じるならバツを選択してください。" draggable="false">
     <div class="choices">
-      <button type="button" class="choice-btn" id="hk-yes" aria-label="丸">⭕</button>
-      <button type="button" class="choice-btn" id="hk-no" aria-label="バツ">❌</button>
+      <button type="button" class="choice-btn" id="hk-yes" aria-label="丸"><img src="images/sym-yes.png" alt="" draggable="false"></button>
+      <button type="button" class="choice-btn" id="hk-no" aria-label="バツ"><img src="images/sym-no.png" alt="" draggable="false"></button>
     </div>
   </section>
 </div>
@@ -113,17 +112,41 @@
   </section>
 </div>
 
-<div class="overlay hk hk-front" id="hk-quiz" hidden>
-  <section class="modal hk-modal hk-blue" role="dialog" aria-modal="true">
-    <h2 class="hk-title">▍Code auto β</h2>
-    <p class="q-text">Question 0 ;&nbsp; 写真を撮る時に使うものは何？</p>
+<!-- Code auto β (別ページ風) -->
+<div class="cab-page" id="cab-page" hidden>
+  <header class="cab-header">
+    <span class="cab-logo">Code auto β</span>
+    <span class="cab-sys"><i class="cab-dot"></i>SYSTEM ONLINE</span>
+  </header>
+
+  <main class="cab-main">
+    <section class="cab-question">
+      <p class="q-text" id="q-text">Question 0 ;&nbsp; 写真を撮る時に使うものは何？</p>
+    </section>
+
     <form class="q-row" id="q-form" autocomplete="off">
       <span class="q-arrow">→</span>
       <input id="q-input" type="text" autocapitalize="off" autocorrect="off" spellcheck="false" enterkeyhint="go" aria-label="答え">
       <button type="submit" class="q-send" id="q-send">送信</button>
     </form>
-    <p class="q-status" id="q-status" hidden>正解を確認。読み込み中......</p>
-  </section>
+    <p class="q-status" id="q-status" hidden>情報を分析中......</p>
+
+    <section class="result" id="result" hidden>
+      <p class="result-text">分析結果はこちらです。必要なアイテムを取捨選択し、情報伝達に役立ててください。</p>
+      <div class="items" id="items">
+        <button type="button" class="item" data-id="mask" data-icon="images/icon-mask.png" aria-pressed="false"><img src="images/item-mask.png" alt="" draggable="false"><span class="item-check">✓</span></button>
+        <button type="button" class="item" data-id="pencil" data-icon="images/icon-pencil.png" aria-pressed="false"><img src="images/item-pencil.png" alt="" draggable="false"><span class="item-check">✓</span></button>
+        <button type="button" class="item" data-id="pen" data-icon="images/icon-pen.png" aria-pressed="false"><img src="images/item-pen.png" alt="" draggable="false"><span class="item-check">✓</span></button>
+      </div>
+      <div class="tray" id="tray"></div>
+      <p class="hint">(選択できたら、<span class="tap-target" id="tap-target">仲間</span>にこの画面を見せて確認してもらおう)</p>
+      <p class="wrong" id="wrong" aria-live="polite">間違い</p>
+    </section>
+
+    <section class="end-practice" id="end-practice">
+      <button type="button" class="end-btn" id="end-btn"><span class="end-fill"></span><span class="end-label">練習を終える</span></button>
+    </section>
+  </main>
 </div>
 
 <script src="app.js"></script>

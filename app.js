@@ -4,10 +4,14 @@
   var TAP_RESET_MS = 6000;      // 最後のタップからこの時間が空くとカウントリセット (ゆっくりタップ対応)
   var CHAR_MS = 70;             // 1文字あたりの表示間隔 (仮)
   var LINE_PAUSE_MS = 700;      // 行と行の間の間 (仮)
-  var CONSOLE_COUNT = 3;        // 一瞬出るコンソールの数
-  var CONSOLE_LIFE_MS = 550;    // コンソール1つの表示時間
-  var CONSOLE_GAP_MS = 380;     // 次のコンソールが出るまでの間隔
-  var END_HOLD_MS = 2500;       // 最後の文章が終わってからバナーを閉じるまでの時間
+  var CONSOLE_FIRST = 2;        // 最初にゆっくり出すコンソールの数
+  var CONSOLE_FIRST_GAP_MS = 450;
+  var CONSOLE_PAUSE_MS = 800;   // 最初の2つのあとの間
+  var CONSOLE_RUSH_MIN = 5;     // 続けて一気に出す数 (5〜6個)
+  var CONSOLE_RUSH_MAX = 6;
+  var CONSOLE_RUSH_GAP_MS = 120; // 一気に出すときのずらし幅
+  var CONSOLE_LIFE_MS = 650;    // コンソール1つの表示時間
+  var END_HOLD_MS = 700;        // 最後の文章が終わってからバナーを閉じるまでの時間
 
   var MSG1 = [
     '暗号生成機能"Code auto β" 起動中',
@@ -21,7 +25,15 @@
   var MSG2 = [
     '利用者の承認が確認できました。',   
   ];
-  var QUIZ_ANSWERS = ['カメラ'];   // ひらがな・カタカナ・半角どれでも可
+  var WRONG_MS = 500;              // 「間違い」の表示時間
+  var LONGPRESS_MS = 1200;         // 「練習を終える」の長押し時間
+  var ANALYZE_MS = 2500;           // 「情報を分析中」から結果表示までの時間
+  var QUESTIONS = [
+    { text: 'Question 0 ;\u00a0 写真を撮る時に使うものは何？', answers: ['カメラ'], correct: ['mask', 'pencil'], endPractice: true },   // 答えはひらがな・カタカナ・半角どれでも可
+    { text: 'Question 1 ;\u00a0 作戦の時間についての情報は？', answers: [] },      // 答え・選択肢は未定
+    { text: 'Question 2 ;\u00a0 爆破する場所についての情報は？', answers: [] },    // 答え・選択肢は未定
+    { text: 'Question 3 ;\u00a0 (問題文は未定です)', answers: [] }                   // 内容を確認中
+  ];
   var CONSOLE_LINES = [
     '$ ssh -p 2222 root@keishicho-core',
     'Permission denied (publickey).',
@@ -85,12 +97,18 @@
     setTimeout(function () { w.remove(); }, CONSOLE_LIFE_MS);
   }
 
+  // 2つ → 間 → 5〜6個を少しずつずらして一気に → すぐ「起動中」のウィンドウへ
   async function consoleBurst() {
-    for (var i = 0; i < CONSOLE_COUNT; i++) {
+    for (var i = 0; i < CONSOLE_FIRST; i++) {
       flashConsole();
-      await sleep(CONSOLE_GAP_MS);
+      await sleep(CONSOLE_FIRST_GAP_MS);
     }
-    await sleep(CONSOLE_LIFE_MS - CONSOLE_GAP_MS > 0 ? CONSOLE_LIFE_MS - CONSOLE_GAP_MS : 0);
+    await sleep(CONSOLE_PAUSE_MS);
+    var rush = CONSOLE_RUSH_MIN + Math.floor(Math.random() * (CONSOLE_RUSH_MAX - CONSOLE_RUSH_MIN + 1));
+    for (var k = 0; k < rush; k++) {
+      flashConsole();
+      await sleep(CONSOLE_RUSH_GAP_MS);
+    }
   }
 
   /* ---- タイプライター ---- */
@@ -107,7 +125,7 @@
         await sleep(CHAR_MS);
       }
       p.classList.remove('typing');
-      await sleep(LINE_PAUSE_MS);
+      if (i < lines.length - 1) await sleep(LINE_PAUSE_MS);
     }
   }
 
@@ -166,19 +184,37 @@
 
   function setupQuiz() {
     var input = $('q-input'), form = $('q-form');
-    var solved = false;
+    var current = 0, solved = false, analyzing = 0;
+    var selected = [];          // 選択順のアイテムid
+    var peerTaps = 0, peerTimer = null;
+
+    function resetSelection() {
+      selected = [];
+      document.querySelectorAll('.item').forEach(function (b) {
+        b.classList.remove('selected');
+        b.setAttribute('aria-pressed', 'false');
+      });
+      $('tray').innerHTML = '';
+    }
 
     function check() {
       if (solved) return;
       var v = normalize(input.value);
-      for (var i = 0; i < QUIZ_ANSWERS.length; i++) {
-        if (v === normalize(QUIZ_ANSWERS[i])) {
+      var answers = QUESTIONS[current].answers;
+      for (var i = 0; i < answers.length; i++) {
+        if (v === normalize(answers[i])) {
           solved = true;
-          input.value = QUIZ_ANSWERS[i];
+          input.value = answers[i];
           input.readOnly = true;
           input.blur();
           $('q-send').disabled = true;
           $('q-status').hidden = false;
+          var token = ++analyzing;
+          setTimeout(function () {
+            if (token !== analyzing) return;
+            $('result').hidden = false;
+            $('result').scrollIntoView({ behavior: 'smooth', block: 'start' });
+          }, ANALYZE_MS);
           return;
         }
       }
@@ -186,6 +222,101 @@
 
     // 送信ボタン (またはEnter) で判定。不正解は無反応
     form.addEventListener('submit', function (e) { e.preventDefault(); check(); });
+
+    // アイテムの選択/解除。選択中のものは下のトレイにアイコン表示
+    document.querySelectorAll('.item').forEach(function (btn) {
+      btn.addEventListener('click', function () {
+        var id = btn.dataset.id, idx = selected.indexOf(id);
+        if (idx >= 0) {
+          selected.splice(idx, 1);
+          btn.classList.remove('selected');
+          btn.setAttribute('aria-pressed', 'false');
+          var old = $('tray').querySelector('[data-id="' + id + '"]');
+          if (old) old.remove();
+        } else {
+          selected.push(id);
+          btn.classList.add('selected');
+          btn.setAttribute('aria-pressed', 'true');
+          var img = document.createElement('img');
+          img.className = 'tray-icon';
+          img.src = btn.dataset.icon;
+          img.alt = '';
+          img.dataset.id = id;
+          $('tray').appendChild(img);
+        }
+      });
+    });
+
+    // 「仲間」を5回タップ → 次のQuestionへ (ゆっくりタップ対応)
+    $('tap-target').addEventListener('click', function () {
+      if (!solved || current >= QUESTIONS.length - 1) return;
+      peerTaps++;
+      clearTimeout(peerTimer);
+      if (peerTaps >= TAPS_REQUIRED) {
+        peerTaps = 0;
+        if (!isCorrect()) { flashWrong(); return; }
+        if (QUESTIONS[current].endPractice) showEndPractice();
+        else nextQuestion();
+        return;
+      }
+      peerTimer = setTimeout(function () { peerTaps = 0; }, TAP_RESET_MS);
+    });
+
+    // 練習問題のあと: 「練習を終える」だけを表示し、長押しで次へ
+    function showEndPractice() {
+      document.querySelector('.cab-main').classList.add('ending');
+      document.querySelector('.cab-main').scrollTop = 0;
+    }
+
+    var holdTimer = null, endBtn = $('end-btn');
+    endBtn.style.setProperty('--hold', (LONGPRESS_MS / 1000) + 's');
+    function cancelHold() {
+      clearTimeout(holdTimer);
+      holdTimer = null;
+      endBtn.classList.remove('holding');
+    }
+    endBtn.addEventListener('pointerdown', function () {
+      cancelHold();
+      endBtn.classList.add('holding');
+      holdTimer = setTimeout(function () {
+        cancelHold();
+        document.querySelector('.cab-main').classList.remove('ending');
+        nextQuestion();
+      }, LONGPRESS_MS);
+    });
+    ['pointerup', 'pointerleave', 'pointercancel'].forEach(function (t) {
+      endBtn.addEventListener(t, cancelHold);
+    });
+    endBtn.addEventListener('contextmenu', function (e) { e.preventDefault(); });
+
+    // 選択が正解 (順不同・過不足なし) か。correct未設定の問題は常に正解扱い
+    function isCorrect() {
+      var c = QUESTIONS[current].correct;
+      if (!c) return true;
+      return c.length === selected.length && c.every(function (id) { return selected.indexOf(id) >= 0; });
+    }
+    var wrongTimer = null;
+    function flashWrong() {
+      var el = $('wrong');
+      el.classList.add('show');
+      clearTimeout(wrongTimer);
+      wrongTimer = setTimeout(function () { el.classList.remove('show'); }, WRONG_MS);
+    }
+
+    function nextQuestion() {
+      current++;
+      solved = false;
+      analyzing++;
+      resetSelection();
+      $('q-text').textContent = QUESTIONS[current].text;
+      $('q-status').hidden = true;
+      $('result').hidden = true;
+      input.value = '';
+      input.readOnly = false;
+      $('q-send').disabled = false;
+      document.querySelector('.cab-main').scrollTop = 0;
+      input.focus();
+    }
   }
 
   $('code-btn').addEventListener('click', async function (e) {
@@ -193,7 +324,7 @@
     if (guideStarted) return;
     guideStarted = true;
 
-    $('hk-quiz').hidden = false;
+    $('cab-page').hidden = false;
     $('q-input').focus();
   });
   setupQuiz();
