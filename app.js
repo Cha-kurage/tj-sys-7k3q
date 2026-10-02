@@ -175,7 +175,6 @@
   }
 
   /* ---- Code auto β → 練習問題 ---- */
-  var guideStarted = false;
 
   function normalize(str) {
     return str.normalize('NFKC').replace(/\s/g, '').toLowerCase()
@@ -319,13 +318,15 @@
     }
   }
 
-  $('code-btn').addEventListener('click', async function (e) {
+  // 開く (閉じても入力・選択状態はそのまま残る)
+  $('code-btn').addEventListener('click', function (e) {
     e.preventDefault();
-    if (guideStarted) return;
-    guideStarted = true;
-
     $('cab-page').hidden = false;
-    $('q-input').focus();
+    if (!$('q-input').readOnly) $('q-input').focus();
+  });
+  $('cab-close').addEventListener('click', function () {
+    if (document.activeElement) document.activeElement.blur();
+    $('cab-page').hidden = true;
   });
   setupQuiz();
 
