@@ -47,29 +47,37 @@
     </li>
   </ul>
 
-  <!-- ハッキング後に出現 -->
+  <!-- ハッキング後に出現 (長押しで開く) -->
   <div class="action-row">
-    <a class="code-btn" id="code-btn" href="#" hidden>Code auto β</a>
-    <button type="button" class="record-btn locked" id="record-btn" aria-hidden="true" tabindex="-1">これまでの記録を見る</button>
+    <button type="button" class="img-btn" id="code-btn" aria-label="Code auto β" hidden><img src="images/btn-code.png" alt="Code auto β" draggable="false"></button>
+    <button type="button" class="img-btn locked" id="record-btn" aria-label="これまでの記録を見る" aria-hidden="true" tabindex="-1"><img src="images/btn-record.png" alt="これまでの記録を見る" draggable="false"></button>
   </div>
+
+  <button type="button" class="banner banner-bottom" data-banner="images/banner2.png" aria-label="広告を拡大"><img src="images/banner2.png" alt="広告" draggable="false"></button>
+  <button type="button" class="banner banner-bottom banner-second" data-banner="images/banner1.png" aria-label="広告を拡大"><img src="images/banner1.png" alt="広告" draggable="false"></button>
 </main>
 
 <footer class="site-footer">
   <p>刑視庁 刑務所管理部</p>
 </footer>
 
-<!-- 注意事項 -->
+<!-- 注意事項 (画像。「金」と「建」の同時タップで起動) -->
 <div class="overlay" id="modal-caution" hidden>
-  <section class="modal" role="dialog" aria-modal="true" aria-labelledby="t-caution">
+  <section class="modal modal-image" role="dialog" aria-modal="true" aria-label="注意事項">
     <button type="button" class="close" aria-label="閉じる">×</button>
-    <h2 id="t-caution">注意事項</h2>
-    <div class="banner-mark" aria-hidden="true">
-      <span class="hand">✋</span>
-      <span class="slash"></span>
+    <div class="caution-wrap">
+      <img src="images/caution.png" alt="注意事項" draggable="false">
+      <div class="hot hot-kin" id="hot-kin"></div>
+      <div class="hot hot-ken" id="hot-ken"></div>
     </div>
-    <p>刑務所内では走らない。<br>
-    手に赤い斜線の入ったマークがついているものには触れない。<br>
-    何かあったらスタッフに伝えること。</p>
+  </section>
+</div>
+
+<!-- バナー拡大 -->
+<div class="overlay" id="modal-banner" hidden>
+  <section class="modal modal-image" role="dialog" aria-modal="true" aria-label="広告">
+    <button type="button" class="close" aria-label="閉じる">×</button>
+    <img id="banner-large" src="" alt="広告" draggable="false">
   </section>
 </div>
 
@@ -86,18 +94,6 @@
     </div>
   </section>
 </div>
-
-<!-- これまでの記録 -->
-<div class="overlay" id="modal-record" hidden>
-  <section class="modal modal-long" role="dialog" aria-modal="true" aria-labelledby="t-record">
-    <button type="button" class="close" aria-label="閉じる">×</button>
-    <h2 id="t-record">これまでの記録</h2>
-    <div class="scroll" id="record-body"></div>
-  </section>
-</div>
-
-<!-- 隠しタップ領域 (右下) -->
-<div class="secret-zone" id="secret-zone" aria-hidden="true"></div>
 
 <!-- ハッキングされたシステム -->
 <div class="overlay hk" id="hk-msg" hidden>
@@ -138,7 +134,7 @@
     <section class="cab-question">
       <p class="q-text" id="q-text">Question 0 ;&nbsp; 写真を撮る時に使うものは何？</p>
     </section>
-    <p class="q-note">全てひらがなで入力</p>
+    <p class="q-note">出てきた答えを全てひらがなで入力</p>
 
     <form class="q-row" id="q-form" autocomplete="off">
       <span class="q-arrow">→</span>
@@ -166,6 +162,18 @@
       <button type="button" class="end-btn" id="end-btn"><span class="end-fill"></span><span class="end-label">練習を終える</span></button>
     </section>
   </main>
+</div>
+
+<!-- これまでの記録 (別ページ風) -->
+<div class="cab-page rec-page" id="rec-page" hidden>
+  <header class="cab-header">
+    <span class="cab-logo cab-logo-jp">これまでの記録</span>
+    <div class="cab-right">
+      <span class="cab-sys"><i class="cab-dot"></i>ARCHIVE</span>
+      <button type="button" class="cab-close" id="rec-close" aria-label="閉じる">✕</button>
+    </div>
+  </header>
+  <main class="cab-main rec-main" id="rec-main"></main>
 </div>
 
 <script src="app.js"></script>
