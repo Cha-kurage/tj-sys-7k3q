@@ -11,7 +11,7 @@
 <link rel="manifest" href="manifest.json">
 <link rel="apple-touch-icon" href="icon.svg">
 <link rel="icon" href="icon.svg">
-<title>刑務所内向けインフォメーション | 刑視庁</title>
+<title>監獄内向けインフォメーション | 刑視庁</title>
 <link rel="stylesheet" href="fonts/play.css">
 <link rel="stylesheet" href="style.css">
 </head>
@@ -29,7 +29,7 @@
 </header>
 
 <main>
-  <h1>刑務所内向けインフォメーション</h1>
+  <h1>監獄内向けインフォメーション</h1>
   <p class="lead">収容者の皆さまへ、必要な情報をお知らせします。項目を選択してください。</p>
 
   <ul class="menu">
@@ -49,8 +49,8 @@
 
   <!-- ハッキング後に出現 (長押しで開く) -->
   <div class="action-row">
-    <button type="button" class="img-btn" id="code-btn" aria-label="Code auto β" hidden><img src="images/btn-code.png" alt="Code auto β" draggable="false"></button>
-    <button type="button" class="img-btn locked" id="record-btn" aria-label="これまでの記録を見る" aria-hidden="true" tabindex="-1"><img src="images/btn-record.png" alt="これまでの記録を見る" draggable="false"></button>
+    <button type="button" class="img-btn" id="code-btn" aria-label="Code auto β" hidden><img src="images/btn-code.png" alt="Code auto β" draggable="false"><span class="hold-mask"><span class="hold-fill"></span></span></button>
+    <button type="button" class="img-btn locked" id="record-btn" aria-label="これまでの記録を見る" aria-hidden="true" tabindex="-1"><img src="images/btn-record.png" alt="これまでの記録を見る" draggable="false"><span class="hold-mask"><span class="hold-fill"></span></span></button>
   </div>
 
   <button type="button" class="banner banner-bottom" data-banner="images/banner2.png" aria-label="広告を拡大"><img src="images/banner2.png" alt="広告" draggable="false"></button>
@@ -149,6 +149,10 @@
       <div class="tray" id="tray"></div>
       <p class="hint">(選択できたら、<span class="tap-target" id="tap-target">仲間</span>にこの画面を見せて確認してもらおう)</p>
       <p class="wrong" id="wrong" aria-live="polite">間違い</p>
+    </section>
+
+    <section class="all-done" id="all-done">
+      <p>Questionは全て回答されました。<br>「これまでの記録を見る」ボタンを長押しで<br>これまでのQuestionと回答、分析結果を見ることができます。</p>
     </section>
 
     <section class="end-practice" id="end-practice">

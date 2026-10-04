@@ -398,7 +398,6 @@ h1 {
 .item.selected {
   opacity: 1;
   border-color: #4dd2ff;
-  box-shadow: 0 0 22px rgba(77, 210, 255, .8);
 }
 .item-check {
   position: absolute;
@@ -580,7 +579,34 @@ h1 {
 .img-btn[hidden] { display: none; }
 .img-btn img { display: block; width: 100%; height: auto; pointer-events: none; }
 .img-btn.locked { visibility: hidden; pointer-events: none; }   /* 場所は確保したまま、解禁まで隠す */
-.img-btn.holding { filter: brightness(1.4); transform: scale(.97); }
+.img-btn.holding { filter: brightness(1.2) drop-shadow(0 0 16px rgba(255, 255, 255, .85)); transform: scale(.97); }
+.img-btn.fired { animation: fire-flash .35s ease-out; }
+@keyframes fire-flash { 0% { filter: brightness(2.6); transform: scale(1.06); } 100% { filter: none; transform: none; } }
+
+/* 長押しの進行を示すフィル (ボタンの形でくり抜く) */
+.hold-mask {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  pointer-events: none;
+  -webkit-mask-size: 100% 100%;
+  mask-size: 100% 100%;
+  -webkit-mask-repeat: no-repeat;
+  mask-repeat: no-repeat;
+}
+#code-btn .hold-mask { -webkit-mask-image: url("images/btn-code.png"); mask-image: url("images/btn-code.png"); }
+#record-btn .hold-mask { -webkit-mask-image: url("images/btn-record.png"); mask-image: url("images/btn-record.png"); }
+.hold-fill {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  width: 0;
+  background: linear-gradient(90deg, rgba(255, 255, 255, .2), rgba(255, 255, 255, .8));
+  border-right: 4px solid #fff;
+  transition: width .2s ease-out;
+}
+.img-btn.holding .hold-fill { width: 100%; transition: width var(--hold-btn, 1s) linear; }
 .img-btn.picked { filter: drop-shadow(0 0 14px #4dd2ff); }      /* Q3: Code auto β を選択中 */
 .img-btn.picked::after {
   content: "✓";
@@ -636,3 +662,14 @@ h1 {
 .rec-yn .off { opacity: .45; }
 .rec-glasses { max-width: 480px; padding: 22px 24px 26px; background: #fff; border: 2px solid #1a1a1a; border-radius: 8px; }
 .rec-glasses > img { display: block; width: 100%; height: auto; }
+
+/* 全Question回答後の画面 */
+.all-done { display: none; }
+.cab-main.complete .all-done {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 62vh;
+}
+.cab-main.complete > *:not(.all-done) { display: none; }
+.all-done p { margin: 0; max-width: 760px; text-align: center; font-size: 26px; line-height: 2.1; color: #e4f1ff; text-shadow: 0 0 14px rgba(77, 210, 255, .6); }

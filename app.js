@@ -33,7 +33,7 @@
   //   items=選択肢の画像(images/item-◯◯.png と images/icon-◯◯.png) / correct=正解の選択(順不同)
   var QUESTIONS = [
     { text: 'Question 0 ;\u00a0 写真を撮る時に使うものは何？',
-      answers: ['カメラ'],
+      answers: ['かめら'],
       items: ['mask', 'pencil', 'tissue'],                    // マスク・鉛筆・ティッシュ
       correct: ['mask', 'pencil'],
       endPractice: true },
@@ -117,6 +117,7 @@
   });
 
   /* ---- 長押しボタン ---- */
+  document.documentElement.style.setProperty('--hold-btn', (BTN_HOLD_MS / 1000) + 's');
   function onHold(el, ms, onFire, onTap) {
     var timer = null, fired = false;
     function cancel() { clearTimeout(timer); timer = null; el.classList.remove('holding'); }
@@ -124,7 +125,13 @@
       fired = false;
       cancel();
       el.classList.add('holding');
-      timer = setTimeout(function () { timer = null; fired = true; el.classList.remove('holding'); onFire(); }, ms);
+      timer = setTimeout(function () {
+        timer = null; fired = true;
+        el.classList.remove('holding');
+        el.classList.add('fired');
+        setTimeout(function () { el.classList.remove('fired'); }, 400);
+        onFire();
+      }, ms);
     });
     el.addEventListener('pointerup', function () {
       var pending = timer !== null;
@@ -246,8 +253,7 @@
     if (consentGiven) {                  // 1. 利用者の同意 + その時のメガネのウィンドウ
       var s = el('section', 'rec-section');
       s.appendChild(el('p', 'rec-tag', 'RECORD ' + (++n)));
-      s.appendChild(el('p', 'rec-title', '利用者の同意を得たこと'));
-      s.appendChild(el('p', 'rec-label', 'その時に表示されたウィンドウ'));
+      s.appendChild(el('p', 'rec-title', 'Code auto βを使用し始める際、利用者の同意を得た。'));
       var g = el('div', 'rec-glasses');
       g.appendChild(imgEl('images/choice-head.png'));
       var yn = el('div', 'rec-yn');
@@ -265,14 +271,12 @@
       s.appendChild(el('p', 'rec-tag', 'RECORD ' + (++n)));
       s.appendChild(el('p', 'rec-title', q.text));
       s.appendChild(el('p', 'rec-ans', '→ ' + r.answer));
-      s.appendChild(el('p', 'rec-label', 'その時に表示された選択肢'));
       var opts = el('div', 'rec-opts');
       q.items.forEach(function (id) { opts.appendChild(imgEl('images/item-' + id + '.png')); });
-      if (q.extra === 'cab') opts.appendChild(imgEl('images/btn-code.png', 'rec-cab'));
       s.appendChild(opts);
-      s.appendChild(el('p', 'rec-label', '正解'));
+      s.appendChild(el('p', 'rec-label', 'あなたの選択'));
       var ic = el('div', 'rec-icons');
-      q.correct.forEach(function (id) { ic.appendChild(imgEl('images/icon-' + id + '.png')); });
+      r.selected.forEach(function (id) { ic.appendChild(imgEl('images/icon-' + id + '.png')); });   // 実際に選んだもの
       s.appendChild(ic);
       main.appendChild(s);
     });
@@ -289,9 +293,9 @@
 
   /* ---- Code auto β → 練習問題 ---- */
 
+  // 答えはひらがなのみ正解 (カタカナ・半角カナ・英字は不正解)。空白だけ無視。
   function normalize(str) {
-    return str.normalize('NFKC').replace(/\s/g, '').toLowerCase()
-      .replace(/[ぁ-ゖ]/g, function (c) { return String.fromCharCode(c.charCodeAt(0) + 0x60); });
+    return str.normalize('NFKC').replace(/\s/g, '');
   }
 
   function setupQuiz() {
@@ -407,7 +411,7 @@
         recordCurrent();
         if (QUESTIONS[current].endPractice) showEndPractice();
         else if (current < QUESTIONS.length - 1) nextQuestion();
-        // 最後のQuestionの正解後の動作は未定
+        else showAllDone();
       }, PEER_HOLD_MS);
     });
     ['pointerup', 'pointerleave', 'pointercancel'].forEach(function (t) {
@@ -417,6 +421,13 @@
 
     function recordCurrent() {
       records.push({ qi: current, answer: input.value, selected: selected.slice() });
+    }
+
+    // 最後のQuestionのあと: 何もない画面の中央にメッセージ
+    function showAllDone() {
+      var m = document.querySelector('.cab-main');
+      m.classList.add('complete');
+      m.scrollTop = 0;
     }
 
     // 練習問題のあと: 「練習を終える」だけを表示し、長押しで次へ
