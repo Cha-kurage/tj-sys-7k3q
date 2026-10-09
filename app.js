@@ -3,7 +3,8 @@
   var HOT_TAPS = 5;             // 「金」「建」それぞれのタップ回数
   var HOT_IDLE_MS = 5000;       // タップが途切れてからカウントをリセットするまでの時間 (ゆっくりでもOK)
   var CONSOLE_AFTER_MS = 700;   // 緑のコンソール演出のあと、メッセージが出るまでの間
-  var RELOAD_HOLD_MS = 5000;    // スタッフ用リロード(画面右上の長押し)の時間
+  var RELOAD_TAPS = 5;          // スタッフ用リロード: 画面右上のタップ回数
+  var RELOAD_IDLE_MS = 4000;    // タップが途切れてからカウントをリセットするまでの時間
   var BTN_HOLD_MS = 1000;       // Code auto β / これまでの記録を見る の長押し時間
   var CHAR_MS = 70;             // 1文字あたりの表示間隔 (仮)
   var LINE_PAUSE_MS = 700;      // 行と行の間の間 (仮)
@@ -492,19 +493,18 @@
     document.removeEventListener('pointerdown', once);
   });
 
-  /* ---- スタッフ用: 画面の右上を5秒長押しでリロード (進行状況もリセット) ---- */
+  /* ---- スタッフ用: 画面の右上を5回タップでリロード (進行状況もリセット) ---- */
   // どの画面の上でも有効。見えない専用エリアは置かず、座標だけで判定するので
   // 右上にある「✕」ボタンなどの通常のタップは邪魔しない。
-  var reloadTimer = null, RELOAD_AREA = 140;   // 右上 140px 四方
+  var reloadTaps = 0, reloadIdle = null, RELOAD_AREA = 140;   // 右上 140px 四方
   function inReloadArea(e) { return e.clientX >= window.innerWidth - RELOAD_AREA && e.clientY <= RELOAD_AREA; }
-  function cancelReload() { clearTimeout(reloadTimer); reloadTimer = null; }
   document.addEventListener('pointerdown', function (e) {
-    cancelReload();
     if (!inReloadArea(e)) return;
-    reloadTimer = setTimeout(function () { location.reload(); }, RELOAD_HOLD_MS);
+    reloadTaps++;
+    clearTimeout(reloadIdle);
+    if (reloadTaps >= RELOAD_TAPS) { location.reload(); return; }
+    reloadIdle = setTimeout(function () { reloadTaps = 0; }, RELOAD_IDLE_MS);
   }, true);
-  document.addEventListener('pointermove', function (e) { if (reloadTimer && !inReloadArea(e)) cancelReload(); }, true);
-  ['pointerup', 'pointercancel'].forEach(function (t) { document.addEventListener(t, cancelReload, true); });
 
   /* ---- ピンチズーム防止 (iOS) ---- */
   ['gesturestart', 'gesturechange'].forEach(function (t) {
