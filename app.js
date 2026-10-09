@@ -1,9 +1,9 @@
 (function () {
   /* ================= 設定 (ここを変えて調整) ================= */
   var HOT_TAPS = 5;             // 「金」「建」それぞれのタップ回数
-  var HOT_IDLE_MS = 5000;       // タップが途切れてからカウントをリセットするまでの時間 (ゆっくりでもOK)
+  var HOT_IDLE_MS = 8000;       // タップが途切れてからカウントをリセットするまでの時間 (ゆっくりでもOK)
   var CONSOLE_AFTER_MS = 700;   // 緑のコンソール演出のあと、メッセージが出るまでの間
-  var RELOAD_TAPS = 5;          // スタッフ用リロード: 画面右上のタップ回数
+  var RELOAD_TAPS = 5;          // スタッフ用リロード: 画面右下のタップ回数
   var RELOAD_IDLE_MS = 4000;    // タップが途切れてからカウントをリセットするまでの時間
   var BTN_HOLD_MS = 1000;       // Code auto β / これまでの記録を見る の長押し時間
   var CHAR_MS = 70;             // 1文字あたりの表示間隔 (仮)
@@ -493,11 +493,11 @@
     document.removeEventListener('pointerdown', once);
   });
 
-  /* ---- スタッフ用: 画面の右上を5回タップでリロード (進行状況もリセット) ---- */
+  /* ---- スタッフ用: 画面の右下を5回タップでリロード (進行状況もリセット) ---- */
   // どの画面の上でも有効。見えない専用エリアは置かず、座標だけで判定するので
-  // 右上にある「✕」ボタンなどの通常のタップは邪魔しない。
-  var reloadTaps = 0, reloadIdle = null, RELOAD_AREA = 140;   // 右上 140px 四方
-  function inReloadArea(e) { return e.clientX >= window.innerWidth - RELOAD_AREA && e.clientY <= RELOAD_AREA; }
+  // 通常のタップは邪魔しない。
+  var reloadTaps = 0, reloadIdle = null, RELOAD_AREA = 140;   // 右下 140px 四方
+  function inReloadArea(e) { return e.clientX >= window.innerWidth - RELOAD_AREA && e.clientY >= window.innerHeight - RELOAD_AREA; }
   document.addEventListener('pointerdown', function (e) {
     if (!inReloadArea(e)) return;
     reloadTaps++;
