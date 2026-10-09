@@ -6,31 +6,25 @@
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="default">
-<meta name="apple-mobile-web-app-title" content="刑視庁">
+<meta name="apple-mobile-web-app-title" content="THE JAIL">
 <meta name="theme-color" content="#ffffff">
 <link rel="manifest" href="manifest.json">
-<link rel="apple-touch-icon" href="icon.svg">
-<link rel="icon" href="icon.svg">
-<title>監獄内向けインフォメーション | 刑視庁</title>
+<link rel="apple-touch-icon" href="images/apple-touch-icon.png">
+<link rel="icon" href="images/icon-192.png">
+<title>THE JAIL内向けインフォメーション</title>
 <link rel="stylesheet" href="fonts/play.css">
+<link rel="stylesheet" href="fonts/murecho.css">
 <link rel="stylesheet" href="style.css">
 </head>
 <body>
 
 <header class="site-header">
-  <div class="agency">
-    <svg class="emblem" viewBox="0 0 48 48" aria-hidden="true">
-      <circle cx="24" cy="24" r="22" fill="none" stroke="#1a1a1a" stroke-width="2.5"/>
-      <path d="M24 9l12 4v9c0 8-5 13-12 17-7-4-12-9-12-17v-9z" fill="#1a1a1a"/>
-      <path d="M18 20h12M18 25h12M18 30h12M22 17v16M26 17v16" stroke="#fff" stroke-width="1.6"/>
-    </svg>
-    <span class="agency-name">刑視庁</span>
-  </div>
+  <img class="site-logo" src="images/logo-thejail.png" alt="THE JAIL" draggable="false">
 </header>
 
 <main>
-  <h1>監獄内向けインフォメーション</h1>
-  <p class="lead">収容者の皆さまへ、必要な情報をお知らせします。項目を選択してください。</p>
+  <h1>THE JAIL内向けインフォメーション</h1>
+  <p class="lead">収監者の皆さまへ、必要な情報をお知らせします。項目を選択してください。</p>
 
   <ul class="menu">
     <li>
@@ -53,12 +47,12 @@
     <button type="button" class="img-btn locked" id="record-btn" aria-label="これまでの記録を見る" aria-hidden="true" tabindex="-1"><img src="images/btn-record.png" alt="これまでの記録を見る" draggable="false"><span class="hold-mask"><span class="hold-fill"></span></span></button>
   </div>
 
-  <button type="button" class="banner banner-bottom" data-banner="images/banner2.png" aria-label="広告を拡大"><img src="images/banner2.png" alt="広告" draggable="false"></button>
-  <button type="button" class="banner banner-bottom banner-second" data-banner="images/banner1.png" aria-label="広告を拡大"><img src="images/banner1.png" alt="広告" draggable="false"></button>
+  <button type="button" class="banner banner-bottom" data-banner="images/banner-senryu.png" aria-label="広告を拡大"><img src="images/banner-senryu.png" alt="広告" draggable="false"></button>
+  <button type="button" class="banner banner-bottom banner-second" data-banner="images/banner-ai.png" aria-label="広告を拡大"><img src="images/banner-ai.png" alt="広告" draggable="false"></button>
 </main>
 
 <footer class="site-footer">
-  <p>刑視庁 刑務所管理部</p>
+  <p>THE JAIL 刑務所管理部</p>
 </footer>
 
 <!-- 注意事項 (画像。「金」と「建」の同時タップで起動) -->
@@ -98,7 +92,7 @@
 <!-- ハッキングされたシステム -->
 <div class="overlay hk" id="hk-msg" hidden>
   <section class="modal hk-modal" role="dialog" aria-modal="true">
-    <h2 class="hk-title">▍INCOMING TRANSMISSION</h2>
+    <h2 class="hk-title">Code auto β</h2>
     <div class="scroll hk-body" id="hk-msg-body"></div>
   </section>
 </div>
@@ -115,7 +109,7 @@
 
 <div class="overlay hk hk-front2" id="hk-thanks" hidden>
   <section class="modal hk-modal" role="dialog" aria-modal="true">
-    <h2 class="hk-title">▍INCOMING TRANSMISSION</h2>
+    <h2 class="hk-title">Code auto β</h2>
     <div class="scroll hk-body" id="hk-thanks-body"></div>
   </section>
 </div>

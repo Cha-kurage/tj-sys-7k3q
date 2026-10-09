@@ -1,6 +1,9 @@
 (function () {
   /* ================= 設定 (ここを変えて調整) ================= */
-  var SIMUL_MS = 600;           // 「金」「建」を同時タップとみなす時間差
+  var HOT_TAPS = 5;             // 「金」「建」それぞれのタップ回数
+  var HOT_IDLE_MS = 5000;       // タップが途切れてからカウントをリセットするまでの時間 (ゆっくりでもOK)
+  var CONSOLE_AFTER_MS = 700;   // 緑のコンソール演出のあと、メッセージが出るまでの間
+  var RELOAD_HOLD_MS = 5000;    // スタッフ用リロード(画面右上の長押し)の時間
   var BTN_HOLD_MS = 1000;       // Code auto β / これまでの記録を見る の長押し時間
   var CHAR_MS = 70;             // 1文字あたりの表示間隔 (仮)
   var LINE_PAUSE_MS = 700;      // 行と行の間の間 (仮)
@@ -14,13 +17,8 @@
   var END_HOLD_MS = 700;        // 最後の文章が終わってからバナーを閉じるまでの時間
 
   var MSG1 = [
-    '暗号生成機能"Code auto β" 起動中',
-    '.',
-    '.',
-    '.',
-    '起動完了。利用者の承認を待ちます。',
-    '利用者の方々へ',
-    'こちらの機能を開くために、次の画面で⭕️を選択してください。'
+    '暗号生成機能"Code auto β"起動',
+    '利用者の方々の承認を待ちます。'
   ];
   var MSG2 = [
     '利用者の承認が確認できました。',   
@@ -39,8 +37,8 @@
       endPractice: true },
     { text: 'Question 1 ;\u00a0 作戦の時間についての情報は？',
       answers: ['にじよりかいし'],
-      items: ['chain', 'sharp', 'battery', 'eraser'],         // 鎖・シャープペン・電池・消しゴム
-      correct: ['chain', 'sharp'] },
+      items: ['chain', 'ballpoint', 'battery', 'eraser'],      // 鎖・ボールペン・電池・消しゴム
+      correct: ['chain', 'ballpoint'] },
     { text: 'Question 2 ;\u00a0 爆破する場所についての情報は？',
       answers: ['えいちのにばんくかく'],
       items: ['diamond', 'heart', 'club', 'spade'],           // ダイヤ・ハート・クラブ・スペード
@@ -87,24 +85,21 @@
     });
   });
 
-  /* ---- 起動トリガー: 注意事項の「金」と「建」を同時にタップ ---- */
+  /* ---- 起動トリガー: 注意事項の「金」と「建」をそれぞれ5回タップ ---- */
   var busy = false, finished = false;
-  var hotDown = { kin: 0, ken: 0 }, hotActive = { kin: false, ken: false };
+  var hotCount = { kin: 0, ken: 0 }, hotIdle = null;
   ['kin', 'ken'].forEach(function (k) {
-    var other = k === 'kin' ? 'ken' : 'kin', el = $('hot-' + k);
-    el.addEventListener('pointerdown', function () {
-      var now = Date.now();
-      hotDown[k] = now;
-      hotActive[k] = true;
-      if (hotActive[other] || now - hotDown[other] < SIMUL_MS) {
-        hotDown.kin = hotDown.ken = 0;
+    $('hot-' + k).addEventListener('pointerdown', function () {
+      hotCount[k]++;
+      clearTimeout(hotIdle);
+      hotIdle = setTimeout(function () { hotCount.kin = hotCount.ken = 0; }, HOT_IDLE_MS);
+      if (hotCount.kin >= HOT_TAPS && hotCount.ken >= HOT_TAPS) {
+        hotCount.kin = hotCount.ken = 0;
+        clearTimeout(hotIdle);
         if (busy || finished) return;
         hide();            // 注意事項の画像を閉じる
         startHack();
       }
-    });
-    ['pointerup', 'pointerleave', 'pointercancel'].forEach(function (t) {
-      el.addEventListener(t, function () { hotActive[k] = false; });
     });
   });
 
@@ -207,6 +202,7 @@
   async function startHack() {
     busy = true;
     await consoleBurst();
+    await sleep(CONSOLE_AFTER_MS);
 
     $('hk-msg').hidden = false;
     await typeLines($('hk-msg-body'), MSG1);
@@ -501,6 +497,31 @@
     $('cab-page').hidden = true;
   });
   setupQuiz();
+
+  /* ---- Android: 「戻る」操作を無効化 ---- */
+  // 履歴を1つ積んでおき、戻る(popstate)が来るたびに積み直す。
+  // Chromeはユーザー操作なしで積んだ履歴を飛ばすため、最初のタッチでも積む。
+  function trapBack() { try { history.pushState({ trap: 1 }, '', location.href); } catch (e) {} }
+  trapBack();
+  window.addEventListener('popstate', trapBack);
+  document.addEventListener('pointerdown', function once() {
+    trapBack();
+    document.removeEventListener('pointerdown', once);
+  });
+
+  /* ---- スタッフ用: 画面の右上を5秒長押しでリロード (進行状況もリセット) ---- */
+  // どの画面の上でも有効。見えない専用エリアは置かず、座標だけで判定するので
+  // 右上にある「✕」ボタンなどの通常のタップは邪魔しない。
+  var reloadTimer = null, RELOAD_AREA = 140;   // 右上 140px 四方
+  function inReloadArea(e) { return e.clientX >= window.innerWidth - RELOAD_AREA && e.clientY <= RELOAD_AREA; }
+  function cancelReload() { clearTimeout(reloadTimer); reloadTimer = null; }
+  document.addEventListener('pointerdown', function (e) {
+    cancelReload();
+    if (!inReloadArea(e)) return;
+    reloadTimer = setTimeout(function () { location.reload(); }, RELOAD_HOLD_MS);
+  }, true);
+  document.addEventListener('pointermove', function (e) { if (reloadTimer && !inReloadArea(e)) cancelReload(); }, true);
+  ['pointerup', 'pointercancel'].forEach(function (t) { document.addEventListener(t, cancelReload, true); });
 
   /* ---- ピンチズーム防止 (iOS) ---- */
   ['gesturestart', 'gesturechange'].forEach(function (t) {

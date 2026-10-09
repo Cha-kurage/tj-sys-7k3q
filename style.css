@@ -169,7 +169,7 @@ h1 {
 .hk-modal {
   background: #04120a;
   color: #39ff14;
-  font-family: "Menlo", "Courier New", "Hiragino Sans", monospace;
+  font-family: "Murecho", "Hiragino Sans", "Noto Sans JP", sans-serif;
   max-width: 720px;
   border-radius: 10px;
   box-shadow: none;
@@ -231,7 +231,7 @@ h1 {
   background: #04120a;
   border-radius: 10px;
   color: #39ff14;
-  font-family: "Menlo", "Courier New", monospace;
+  font-family: "Murecho", "Hiragino Sans", "Noto Sans JP", sans-serif;
   font-size: 13px;
   pointer-events: none;
   border-style: solid;
@@ -244,7 +244,7 @@ h1 {
 
 /* 出現位置: 最初のバナーは中央、以降は少しずつずらす */
 #hk-msg .modal { translate: 0 0; }
-#hk-choice .modal { translate: 9vw 10vh; }
+#hk-choice .modal { translate: 0 0; }   /* 画面の中央 */
 #hk-thanks .modal { translate: -7vw -8vh; }
 
 @keyframes blink { 50% { opacity: 0; } }
@@ -265,7 +265,7 @@ h1 {
   flex-direction: column;
   overflow: hidden;
   color: #7ab8ff;
-  font-family: "Menlo", "Courier New", "Hiragino Sans", monospace;
+  font-family: "Murecho", "Hiragino Sans", "Noto Sans JP", sans-serif;
   background:
     radial-gradient(ellipse at 50% -10%, rgba(60, 110, 255, .35), transparent 60%),
     linear-gradient(rgba(122, 184, 255, .06) 1px, transparent 1px) 0 0 / 100% 40px,
@@ -673,3 +673,9 @@ h1 {
 }
 .cab-main.complete > *:not(.all-done) { display: none; }
 .all-done p { margin: 0; max-width: 760px; text-align: center; font-size: 26px; line-height: 2.1; color: #e4f1ff; text-shadow: 0 0 14px rgba(77, 210, 255, .6); }
+
+/* 引っ張って更新などを止める (スクロール領域の端でも画面全体に伝わらないように) */
+.cab-main, .scroll { overscroll-behavior: contain; }
+
+/* ヘッダーのロゴ (THE JAIL) */
+.site-logo { display: block; height: 34px; width: auto; -webkit-user-drag: none; }
