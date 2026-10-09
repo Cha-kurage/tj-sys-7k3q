@@ -44,7 +44,16 @@
   <!-- ハッキング後に出現 (長押しで開く) -->
   <div class="action-row">
     <button type="button" class="img-btn" id="code-btn" aria-label="Code auto β" hidden><img src="images/btn-code.png" alt="Code auto β" draggable="false"><span class="hold-mask"><span class="hold-fill"></span></span></button>
-    <button type="button" class="img-btn locked" id="record-btn" aria-label="これまでの記録を見る" aria-hidden="true" tabindex="-1"><img src="images/btn-record.png" alt="これまでの記録を見る" draggable="false"><span class="hold-mask"><span class="hold-fill"></span></span></button>
+    <div class="rec-wrap">
+      <div class="rec-hint" id="rec-hint" hidden>
+        <p>ここからこれまでの出来事を<br>振り返ることができる。</p>
+        <svg class="rec-hint-arrow" viewBox="0 0 48 110" aria-hidden="true">
+          <path d="M24 4 V94" fill="none" stroke="#1f6fff" stroke-width="5" stroke-linecap="round"/>
+          <path d="M8 78 L24 102 L40 78" fill="none" stroke="#1f6fff" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+      </div>
+      <button type="button" class="img-btn locked" id="record-btn" aria-label="これまでの記録を見る" aria-hidden="true" tabindex="-1"><img src="images/btn-record.png" alt="これまでの記録を見る" draggable="false"><span class="hold-mask"><span class="hold-fill"></span></span></button>
+    </div>
   </div>
 
   <button type="button" class="banner banner-bottom" data-banner="images/banner-senryu.png" aria-label="広告を拡大"><img src="images/banner-senryu.png" alt="広告" draggable="false"></button>
@@ -147,17 +156,6 @@
 
     <section class="all-done" id="all-done">
       <p>Questionは全て回答されました。<br>「これまでの記録を見る」ボタンを長押しで<br>これまでのQuestionと回答、分析結果を見ることができます。</p>
-    </section>
-
-    <section class="end-practice" id="end-practice">
-      <div class="end-note">
-        <svg class="end-arrow" viewBox="0 0 48 110" aria-hidden="true">
-          <path d="M24 106 V16" fill="none" stroke="#4dd2ff" stroke-width="5" stroke-linecap="round"/>
-          <path d="M8 32 L24 8 L40 32" fill="none" stroke="#4dd2ff" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"/>
-        </svg>
-        <p>インフォメーションページから<br>この端末での出来事を振り返ることができる。</p>
-      </div>
-      <button type="button" class="end-btn" id="end-btn"><span class="end-fill"></span><span class="end-label">練習を終える</span></button>
     </section>
   </main>
 </div>

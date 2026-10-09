@@ -25,7 +25,6 @@
   ];
   var PEER_HOLD_MS = 1500;         // 「仲間」の長押し時間
   var WRONG_MS = 500;              // 「間違い」の表示時間
-  var LONGPRESS_MS = 1200;         // 「練習を終える」の長押し時間
   var ANALYZE_MS = 2500;           // 「情報を分析中」から結果表示までの時間
   // 各Question: text=問題文 / answers=答え(ひらがな・カタカナ・半角どれでも可)
   //   items=選択肢の画像(images/item-◯◯.png と images/icon-◯◯.png) / correct=正解の選択(順不同)
@@ -34,7 +33,7 @@
       answers: ['かめら'],
       items: ['mask', 'pencil', 'tissue'],                    // マスク・鉛筆・ティッシュ
       correct: ['mask', 'pencil'],
-      endPractice: true },
+      endPractice: true },        // 仲間の長押しでインフォメーションに戻り、記録ボタンを解禁
     { text: 'Question 1 ;\u00a0 作戦の時間についての情報は？',
       answers: ['にじよりかいし'],
       items: ['chain', 'ballpoint', 'battery', 'eraser'],      // 鎖・ボールペン・電池・消しゴム
@@ -282,6 +281,7 @@
   }
 
   onHold($('record-btn'), BTN_HOLD_MS, function () {
+    $('rec-hint').hidden = true;
     renderRecords();
     $('rec-page').hidden = false;
   });
@@ -405,7 +405,7 @@
         peerHold = null;
         if (!isCorrect()) { flashWrong(); return; }
         recordCurrent();
-        if (QUESTIONS[current].endPractice) showEndPractice();
+        if (QUESTIONS[current].endPractice) finishPractice();
         else if (current < QUESTIONS.length - 1) nextQuestion();
         else showAllDone();
       }, PEER_HOLD_MS);
@@ -426,36 +426,19 @@
       m.scrollTop = 0;
     }
 
-    // 練習問題のあと: 「練習を終える」だけを表示し、長押しで次へ
-    function showEndPractice() {
-      var rb = $('record-btn');           // 「練習を終える」画面が出たら「これまでの記録を見る」を解禁
+    // 練習問題のあと: 次のQuestionを準備して、インフォメーションに戻る。「これまでの記録を見る」を解禁して案内を出す
+    function finishPractice() {
+      var rb = $('record-btn');
       rb.classList.remove('locked');
       rb.removeAttribute('aria-hidden');
       rb.removeAttribute('tabindex');
-      document.querySelector('.cab-main').classList.add('ending');
-      document.querySelector('.cab-main').scrollTop = 0;
+      $('rec-hint').hidden = false;
+      nextQuestion();
+      if (document.activeElement) document.activeElement.blur();
+      $('cab-page').hidden = true;
+      window.scrollTo(0, 0);
+      rb.scrollIntoView({ block: 'center' });
     }
-
-    var holdTimer = null, endBtn = $('end-btn');
-    endBtn.style.setProperty('--hold', (LONGPRESS_MS / 1000) + 's');
-    function cancelHold() {
-      clearTimeout(holdTimer);
-      holdTimer = null;
-      endBtn.classList.remove('holding');
-    }
-    endBtn.addEventListener('pointerdown', function () {
-      cancelHold();
-      endBtn.classList.add('holding');
-      holdTimer = setTimeout(function () {
-        cancelHold();
-        document.querySelector('.cab-main').classList.remove('ending');
-        nextQuestion();
-      }, LONGPRESS_MS);
-    });
-    ['pointerup', 'pointerleave', 'pointercancel'].forEach(function (t) {
-      endBtn.addEventListener(t, cancelHold);
-    });
-    endBtn.addEventListener('contextmenu', function (e) { e.preventDefault(); });
 
     // 選択が正解 (順不同・過不足なし) か。correct未設定の問題は常に正解扱い
     function isCorrect() {
