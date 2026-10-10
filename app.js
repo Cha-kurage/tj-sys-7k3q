@@ -24,7 +24,8 @@
   var MSG2 = [
     '利用者の承認が確認できました。',   
   ];
-  var PEER_HOLD_MS = 1500;         // 「仲間」の長押し時間
+  var PEER_TAPS = 5;               // 「仲間」のタップ回数
+  var PEER_IDLE_MS = 6000;         // タップが途切れてからカウントをリセットするまでの時間
   var WRONG_MS = 500;              // 「間違い」の表示時間
   var ANALYZE_MS = 2500;           // 「情報を分析中」から結果表示までの時間
   // 各Question: text=問題文 / answers=答え(ひらがな・カタカナ・半角どれでも可)
@@ -74,7 +75,14 @@
   /* ---- 通常バナー (注意事項・看守長の挨拶) ---- */
   var open = null;
   function show(id) { var el = $(id); el.hidden = false; open = el; }
-  function hide() { if (open) open.hidden = true; open = null; }
+  function hide() {
+    if (open) {
+      open.hidden = true;
+      var v = open.querySelector('video');        // 看守長の動画は閉じたら止めて頭に戻す
+      if (v) { v.pause(); try { v.currentTime = 0; } catch (e) {} }
+    }
+    open = null;
+  }
 
   document.querySelectorAll('[data-modal]').forEach(function (btn) {
     btn.addEventListener('click', function () { show(btn.dataset.modal); });
@@ -102,6 +110,13 @@
       }
     });
   });
+
+  /* ---- 看守長の動画: 再生ボタン ---- */
+  var wv = $('warden-video'), wp = $('warden-play');
+  wp.addEventListener('click', function () { wv.play(); });
+  wv.addEventListener('play', function () { wp.hidden = true; });
+  wv.addEventListener('pause', function () { if (wv.ended || wv.currentTime < 0.2) wp.hidden = false; });
+  wv.addEventListener('ended', function () { wp.hidden = false; });
 
   /* ---- 広告バナー: タップで拡大 ---- */
   document.querySelectorAll('.banner').forEach(function (b) {
@@ -226,6 +241,7 @@
     closeAllHack();
     finished = true;
     busy = false;
+    $('code-hint').hidden = false;      // 最初に開くまで「長押しで開く」を案内
     var btn = $('code-btn');
     btn.hidden = false;
     btn.classList.add('appear');
@@ -396,25 +412,23 @@
       }
     });
 
-    // 「仲間」を長押し → 次のQuestionへ (正解でなければ「間違い」)
-    var peerHold = null, peerEl = $('tap-target');
-    function cancelPeer() { clearTimeout(peerHold); peerHold = null; }
-    peerEl.addEventListener('pointerdown', function () {
+    // 「仲間」を5回タップ → 次のQuestionへ (正解でなければ「間違い」)
+    var peerTaps = 0, peerIdle = null;
+    $('tap-target').addEventListener('click', function () {
       if (!solved) return;
-      cancelPeer();
-      peerHold = setTimeout(function () {
-        peerHold = null;
+      peerTaps++;
+      clearTimeout(peerIdle);
+      if (peerTaps >= PEER_TAPS) {
+        peerTaps = 0;
         if (!isCorrect()) { flashWrong(); return; }
         recordCurrent();
         if (QUESTIONS[current].endPractice) finishPractice();
         else if (current < QUESTIONS.length - 1) nextQuestion();
         else showAllDone();
-      }, PEER_HOLD_MS);
+        return;
+      }
+      peerIdle = setTimeout(function () { peerTaps = 0; }, PEER_IDLE_MS);
     });
-    ['pointerup', 'pointerleave', 'pointercancel'].forEach(function (t) {
-      peerEl.addEventListener(t, cancelPeer);
-    });
-    peerEl.addEventListener('contextmenu', function (e) { e.preventDefault(); });
 
     function recordCurrent() {
       records.push({ qi: current, answer: input.value, selected: selected.slice() });
@@ -457,6 +471,7 @@
 
     function nextQuestion() {
       current++;
+      peerTaps = 0;
       solved = false;
       analyzing++;
       resetSelection();
@@ -473,6 +488,7 @@
 
   // 長押しで開く (閉じても入力・選択状態はそのまま残る) / タップはQ3の選択用
   onHold($('code-btn'), BTN_HOLD_MS, function () {
+    $('code-hint').hidden = true;
     $('cab-page').hidden = false;
     if (!$('q-input').readOnly) $('q-input').focus();
   }, function () { quiz.tapCab(); });

@@ -43,11 +43,20 @@
 
   <!-- ハッキング後に出現 (長押しで開く) -->
   <div class="action-row">
-    <button type="button" class="img-btn" id="code-btn" aria-label="Code auto β" hidden><img src="images/btn-code.png" alt="Code auto β" draggable="false"><span class="hold-mask"><span class="hold-fill"></span></span></button>
-    <div class="rec-wrap">
-      <div class="rec-hint" id="rec-hint" hidden>
+    <div class="hint-wrap">
+      <div class="hint-box" id="code-hint" hidden>
+        <p>長押しで開く</p>
+        <svg class="hint-arrow" viewBox="0 0 48 110" aria-hidden="true">
+          <path d="M24 4 V94" fill="none" stroke="#1f6fff" stroke-width="5" stroke-linecap="round"/>
+          <path d="M8 78 L24 102 L40 78" fill="none" stroke="#1f6fff" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+      </div>
+      <button type="button" class="img-btn" id="code-btn" aria-label="Code auto β" hidden><img src="images/btn-code.png" alt="Code auto β" draggable="false"><span class="hold-mask"><span class="hold-fill"></span></span></button>
+    </div>
+    <div class="hint-wrap">
+      <div class="hint-box" id="rec-hint" hidden>
         <p>ここからこれまでの出来事を<br>振り返ることができる。</p>
-        <svg class="rec-hint-arrow" viewBox="0 0 48 110" aria-hidden="true">
+        <svg class="hint-arrow" viewBox="0 0 48 110" aria-hidden="true">
           <path d="M24 4 V94" fill="none" stroke="#1f6fff" stroke-width="5" stroke-linecap="round"/>
           <path d="M8 78 L24 102 L40 78" fill="none" stroke="#1f6fff" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"/>
         </svg>
@@ -84,16 +93,29 @@
   </section>
 </div>
 
-<!-- 看守長の挨拶 -->
+<!-- 看守長の挨拶 (動画 + 文字起こし) -->
 <div class="overlay" id="modal-warden" hidden>
-  <section class="modal modal-long" role="dialog" aria-modal="true" aria-labelledby="t-warden">
-    <button type="button" class="close" aria-label="閉じる">×</button>
-    <h2 id="t-warden">看守長の挨拶</h2>
-    <div class="scroll">
-      <p>ああああああああああああああああああああああああああああああああああああああああああああああああああああああああああああ</p>
-      <p>ああああああああああああああああああああああああああああああああああああああああああああああああああああああああああああ</p>
-      <p>ああああああああああああああああああああああああああああああああああああああああああああああああああああああああああああ</p>
-      <p>ああああああああああああああああああああああああああああああああああああああああああああああああああああああああああああ</p>
+  <section class="modal modal-warden" role="dialog" aria-modal="true" aria-labelledby="t-warden">
+    <div class="warden-head">
+      <h2 id="t-warden">看守長の挨拶</h2>
+      <button type="button" class="close" aria-label="閉じる">×</button>
+    </div>
+    <div class="warden-body">
+      <div class="video-box" id="warden-box">
+        <video id="warden-video" src="videos/warden.mp4#t=0.1" preload="metadata" playsinline controls controlsList="nodownload noplaybackrate" disablePictureInPicture></video>
+        <button type="button" class="video-play" id="warden-play" aria-label="再生"><span class="play-tri"></span></button>
+      </div>
+      <p class="transcript">皆様、こんにちは。
+私は看守長の毒島(ぶすじま)です。
+今、みなさんのいるここが最新鋭のAI牢獄「THE JAIL」です。
+AIのシステムの導入により時間なども徹底的に管理することで
+刑務官の人数も最小限で住むようになっております。
+脱獄？そんなことありえません。
+内部から外部への通信は基本的に全て遮断されており、
+また機密情報なども暗号化されていますので
+普通の人間にはおそらく…理解することすらできないでしょう。
+それでは皆様、余生をどうぞごゆっくり。
+今までの罪を反省しながら、この「THE JAIL」にてお過ごしください。</p>
     </div>
   </section>
 </div>
