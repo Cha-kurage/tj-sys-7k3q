@@ -36,15 +36,15 @@
       items: ['mask', 'pencil', 'tissue'],                    // マスク・鉛筆・ティッシュ
       correct: ['mask', 'pencil'],
       endPractice: true },        // 仲間の長押しでインフォメーションに戻り、記録ボタンを解禁
-    { text: 'Question 1 ;\u00a0 作戦の時間についての情報は？',
+    { text: 'Question 1 ;\u00a0 爆破作戦の開始時刻は？',
       answers: ['にじよりかいし'],
       items: ['chain', 'ballpoint', 'battery', 'eraser'],      // 鎖・ボールペン・電池・消しゴム
       correct: ['chain', 'ballpoint'] },
-    { text: 'Question 2 ;\u00a0 爆破する場所についての情報は？',
+    { text: 'Question 2 ;\u00a0 爆破するサーバーの座標は？',
       answers: ['えいちのにばんくかく'],
       items: ['diamond', 'heart', 'club', 'spade'],           // ダイヤ・ハート・クラブ・スペード
       correct: ['diamond', 'heart', 'club', 'spade'] },
-    { text: 'Question 3 ;\u00a0 脱出するために鍵となる場所は？',
+    { text: 'Question 3 ;\u00a0 脱出可能な配管がある座標は？',
       answers: ['ぬけみちはえふのさん'],
       items: ['carabiner', 'clip', 'shook'],                  // カラビナ・クリップ・S字フック
       extra: 'cab',                                           // + インフォメーションの「Code auto β」ボタンをタップして選択

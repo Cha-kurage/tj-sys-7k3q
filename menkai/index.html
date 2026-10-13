@@ -1,0 +1,73 @@
+<!doctype html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="看守用システム">
+<meta name="theme-color" content="#07040f">
+<link rel="apple-touch-icon" href="../images/apple-touch-icon.png">
+<link rel="icon" href="../images/icon-192.png">
+<title>看守用システム</title>
+<link rel="stylesheet" href="../fonts/play.css">
+<link rel="stylesheet" href="../fonts/murecho.css">
+<link rel="stylesheet" href="menkai.css">
+</head>
+<body>
+
+<!-- ① タイトル + マイク -->
+<section class="screen" id="screen-title">
+  <h1 class="title">看守用システム</h1>
+
+  <button type="button" class="mic" id="mic" aria-label="マイク">
+    <span class="ring"></span>
+    <svg class="mic-svg" viewBox="0 0 120 160" aria-hidden="true">
+      <defs>
+        <linearGradient id="mg" x1="0" y1="0" x2="1" y2="1">
+          <stop offset="0" stop-color="#7fe9f5"/>
+          <stop offset="1" stop-color="#7fe9f5"/>
+        </linearGradient>
+      </defs>
+      <rect x="40" y="6" width="40" height="80" rx="20" fill="none" stroke="url(#mg)" stroke-width="5"/>
+      <path d="M46 28h28M46 44h28M46 60h28" stroke="url(#mg)" stroke-width="3" stroke-linecap="round" opacity=".75"/>
+      <path d="M22 70c0 24 16 40 38 40s38-16 38-40" fill="none" stroke="url(#mg)" stroke-width="5" stroke-linecap="round"/>
+      <path d="M60 110v30M38 142h44" fill="none" stroke="url(#mg)" stroke-width="5" stroke-linecap="round"/>
+    </svg>
+  </button>
+  <p class="mic-status" id="mic-status" aria-live="polite"></p>
+</section>
+
+<!-- ② 9枚のタイル + 入力欄 + 確定 -->
+<section class="screen" id="screen-main" hidden>
+  <h2 class="head-title">印刷する資料を選択してください。</h2>
+
+  <div class="grid" id="grid">
+    <button type="button" class="tile" data-id="ant"><img src="../images/menkai-ant.png" alt="" draggable="false"></button>
+    <button type="button" class="tile" data-id="gate"><img src="../images/menkai-gate.png" alt="" draggable="false"></button>
+    <button type="button" class="tile" data-id="stick"><img src="../images/menkai-stick.png" alt="" draggable="false"></button>
+    <button type="button" class="tile" data-id="butterfly"><img src="../images/menkai-butterfly.png" alt="" draggable="false"></button>
+    <button type="button" class="tile" data-id="sun"><img src="../images/menkai-sun.png" alt="" draggable="false"></button>
+    <button type="button" class="tile" data-id="temple"><img src="../images/menkai-temple.png" alt="" draggable="false"></button>
+    <button type="button" class="tile" data-id="slope"><img src="../images/menkai-slope.png" alt="" draggable="false"></button>
+    <button type="button" class="tile" data-id="moon"><img src="../images/menkai-moon.png" alt="" draggable="false"></button>
+    <button type="button" class="tile" data-id="x"><img src="../images/menkai-x.png" alt="" draggable="false"></button>
+  </div>
+
+  <div class="entry">
+    <div class="field" id="field" aria-label="入力欄"><span class="field-text" id="field-text"></span><span class="caret"></span></div>
+    <button type="button" class="confirm" id="confirm" aria-disabled="true">確定</button>
+  </div>
+</section>
+
+<!-- 印刷中 (リセット待ち) -->
+<div class="printing" id="printing" hidden>
+  <div class="print-panel">
+    <p class="print-title">資料を印刷中...</p>
+    <div class="print-bar"><span></span></div>
+  </div>
+</div>
+
+<script src="menkai.js"></script>
+</body>
+</html>
